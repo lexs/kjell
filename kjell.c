@@ -127,10 +127,25 @@ int execute_builtin(char *name, char **argv) {
     return 1;
 }
 
+char* resolve_home(char* path) {
+    char* home = getenv("HOME");
+    if (home == NULL) {
+        return path;
+    }
+
+    size_t home_len = strlen(home);
+    if (strncmp(path, home, home_len) == 0) {
+        path[home_len - 1] = '~';
+        return &path[home_len - 1];
+    } else {
+        return path;
+    }
+}
+
 void print_prompt() {
     char path[128];
     if (getcwd(path, 128) != NULL) {
-        printf("%s$ ", path);
+        printf("%s$ ", resolve_home(path));
     } else {
         printf("$ ");
     }
